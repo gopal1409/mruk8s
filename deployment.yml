@@ -1,6 +1,6 @@
 #to apply this file we will use a command
 #kubectl apply -f nameoftheyaml file
-apiVersion: v1
+apiVersion: apps/v1
 kind: Deployment
 
 metadata: 
