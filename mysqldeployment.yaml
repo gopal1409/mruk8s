@@ -1,0 +1,45 @@
+#to apply this file we will use a command
+#kubectl apply -f nameoftheyaml file
+apiVersion: apps/v1
+kind: Deployment
+
+metadata: 
+  name: mysql
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+
+  template:
+    metadata:
+      
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:5.6
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-db-password #this comes from secret manifest name
+                key: db-password #key of the secrte
+        ports:
+          - containerPort: 80
+            name: mysql
+      #now we need to attach storage and import the configmap
+        volumeMounts:
+          - name: mysql-persistent-storage
+            mountPath: /var/lib/mysql #this mount path is inside your container
+          - name: usermanagement-db-creation-script
+            mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: mysql-persistent-storage
+          persistentVolumeClaim:
+            claimName: task-pv-claim
+        - name: usermanagement-db-creation-script
+          configMap:
+              name: usermanagement-db-creation-script
